@@ -1,0 +1,43 @@
+<script src="script.js"></script>
+
+<body onload="draw()" style="text-align: center;">
+  <input type="text" id="equation" onKeyUp="checkEquation(event)">
+  <h3 id="equation-status"></h3>
+  <canvas id="canvas" width="800" height="250"></canvas>
+    
+</body>
+
+
+
+<script>
+  var logger = document.getElementById('equation-status');
+  var equation = document.getElementById('equation');
+
+  function checkEquation (event) {
+    if(event.keyCode == 13){
+        tryToDraw();
+    }
+    try {
+      var x = 0;
+      var res = eval(equation.value); 
+      logger.innerHTML = res;
+    } catch (e) {
+      logger.innerHTML = e.message;
+    }
+  }
+
+  function tryToDraw() {
+    try {
+      var x = 0;
+      var res = eval(equation.value); 
+      logger.innerHTML = res;
+      var fun = new Function('x', 'return ' + equation.value);
+      console.log(fun);
+      draw(fun);
+    } catch (e) {
+      logger.innerHTML = e.message;
+    }
+  }
+  
+
+</script>
