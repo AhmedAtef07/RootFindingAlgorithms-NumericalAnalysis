@@ -25,7 +25,13 @@ var algoStarted = false;
 
 var rangeLines = {};
 
+var logger;
+var equation;
+
+
 function runOnce() {
+  logger = document.getElementById('equation-status');
+  equation = document.getElementById('equation');
   var canvas = document.getElementById("canvas");
   canvas.width = window.innerWidth - 400;
   canvas.height= window.innerHeight - 70;
@@ -177,4 +183,106 @@ function addNewRangeLine(letter, x) {
     }
   }
   rangeLines.push(rangeLine);
+}
+
+
+
+function checkEquation (event) {
+  try {
+    var x = 0;
+    var res = eval(equation.value); 
+    logger.innerHTML = "Result at x=0: " + res;
+    logger.style.color = "green";
+    tryToDraw();
+  } catch (e) {
+    logger.innerHTML = e.message;
+    logger.style.color = "red";
+  }
+}
+
+function tryToDraw() {
+  var fun = new Function('x', 'return ' + equation.value);
+
+  a = parseFloat(document.getElementById('a').value);
+  b = parseFloat(document.getElementById('b').value);
+
+  rangeLines = [];
+  addNewRangeLine('A', a);
+  addNewRangeLine('B', b);
+
+  draw(fun);
+}  
+
+function propertiesChanged(event) {
+  // console.log(event);
+  elem = event.currentTarget;
+  if (elem.value >= 7) {
+    eval(elem.id + '= parseFloat(elem.value)');
+  }
+  draw();
+}
+
+function addPropertiesToSideBar() {
+  var parentDiv = document.getElementById('properties');
+  for(var i in properties) {
+    var e = properties[i];
+    var label = document.createElement('label');
+    label.innerHTML = e;
+    label.htmlFor = e;
+    var input = document.createElement('input');
+    input.className = 'u-full-width';
+    input.type = 'number';
+    input.min = 7;
+    input.id = e;
+    input.value = eval(e);
+    parentDiv.appendChild(label);
+    parentDiv.appendChild(input);
+    $('input').bind("propertychange change click keyup input paste", function(event) {
+      propertiesChanged(event);
+    });     
+  }
+}
+
+
+function startAlgo(event) {
+  algoStarted = !algoStarted;
+  var target = event.target || event.srcElement;
+  $('#equation-section :input').prop("disabled", algoStarted);
+  if (algoStarted) {
+    target.innerHTML = "Reset";
+    target.classList.remove("button-primary");
+  } else {
+    target.innerHTML = "Start";
+    target.classList.add("button-primary");
+    tryToDraw();
+    return;
+  } 
+  startLooping();
+}
+
+function startLooping() {
+  var finish = false;
+
+  midpoint = (a + b) / 2;
+  if (f(midpoint) * f(a) > 0) {
+    if (Math.abs(f(midpoint) - f(a)) <= (tolerance / 2)) finish = true;
+    console.log('a ' + f(midpoint) + " " + f(a));
+    a = midpoint;
+    addNewRangeLine('A', a);
+  } else {
+    if (Math.abs(f(midpoint) - f(b)) <= (tolerance / 2)) finish = true;
+    console.log('b ' + f(midpoint) + " " + f(b));
+    b = midpoint;
+    addNewRangeLine('B', b);
+  }
+  
+  draw();
+
+  if(finish) {
+    logger.innerHTML = "Root found = " + ((a + b) / 2) + "<br>" +
+      "After " + (rangeLines.length - 2) + " iterations.";
+    logger.style.color = "green";
+  } else {
+    setTimeout(function(){ startLooping(); }, 500);
+  } 
 }

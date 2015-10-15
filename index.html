@@ -1,162 +1,64 @@
-<script src="script.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-<!-- <link rel="stylesheet" href="reset.css"> -->
-<link rel="stylesheet" href="style.css">
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="script.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <!-- <link rel="stylesheet" href="reset.css"> -->
+    <link rel="stylesheet" href="style.css">
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
 
-<title>Atef's Plotter</title>
+    <title>Atef's Plotter</title>
+  </head>
 
-<body onload="runOnce()">
-  <div class="full-width-container">
-    <div class="row">
-      
-      <!-- Side Bar Section -->
-      <div class="three columns">
-        <div class="row">
-          <div id="equation-section">
-            <label for="equation">Equation</label>
-            <label style="color: gray; font-size: smaller;">Use JavaScript Syntax</label>
-            <input class="u-full-width" type="text" placeholder="Math.sin(Math.pow(x, 2))" id="equation" value="Math.pow(x - 3, 3) + 3" onKeyUp="checkEquation(event)">
-            <h5 id="equation-status"></h5>
-            <label for="a">a</label>
-            <input class="u-full-width" type="number" step="0.1" id="a">
-            <label for="b">b</label>
-            <input class="u-full-width" type="number" step="0.1" id="b">
-            <label for="tolerance">tolerance</label>
-            <input class="u-full-width" type="number" step="0.1" id="tolerance" min=".2">
+  <body onload="runOnce()">
+    <div class="full-width-container">
+      <div class="row">
+        
+        <!-- Side Bar Section -->
+        <div class="three columns">
+          <div class="row">
+            <div id="equation-section">
+              <label for="equation">Equation</label>
+              <label style="color: gray; font-size: smaller;">Use JavaScript Syntax</label>
+              <input class="u-full-width" type="text" placeholder="Math.sin(Math.pow(x, 2))" id="equation" value="Math.pow(x - 3, 3) + 3" onKeyUp="checkEquation(event)">
+              <h5 id="equation-status"></h5>
+              <label for="a">a</label>
+              <input class="u-full-width" type="number" step="0.1" id="a">
+              <label for="b">b</label>
+              <input class="u-full-width" type="number" step="0.1" id="b">
+              <label for="tolerance">tolerance</label>
+              <input class="u-full-width" type="number" step="0.1" id="tolerance" min=".2">
+            </div>
+              <button class="button button-primary u-full-width" onclick="startAlgo(event)">Start Bisection Algo</button>
+            <div id="properties"></div>
+            <hr>
+            <div>
+              <label>Useful Methods</label>
+              <ul>
+                <li>Math.E</li>
+                <li>Math.cos(2 * x)</li>
+                <li>Math.PI</li>
+                <li>Math.pow(x, 2)</li>
+                <li>Math.abs(-5)</li>
+              </ul>
+            </div>
           </div>
-            <button class="button button-primary u-full-width" onclick="startAlgo(event)">Start Bisection Algo</button>
-          <div id="properties"></div>
-          <hr>
-          <div>
-            <label>Useful Methods</label>
-            <ul>
-              <li>Math.E</li>
-              <li>Math.cos(2 * x)</li>
-              <li>Math.PI</li>
-              <li>Math.pow(x, 2)</li>
-              <li>Math.abs(-5)</li>
-            </ul>
-          </div>
+        </div>     
+        <!-- ./Side Bar Section -->
+
+
+        <!-- Content Section -->
+        <div class="nine columns">
+          <canvas id="canvas"></canvas>    
         </div>
-      </div>     
-      <!-- ./Side Bar Section -->
+        <!-- ./Content Section -->
 
 
-      <!-- Content Section -->
-      <div class="nine columns">
-        <canvas id="canvas"></canvas>    
-      </div>
-      <!-- ./Content Section -->
+     </div>
+    </div> 
 
-
-   </div>
-  </div>    
-</body>
-
-
-
-<script>
-  var logger = document.getElementById('equation-status');
-  var equation = document.getElementById('equation');
-
-  function checkEquation (event) {
-    try {
-      var x = 0;
-      var res = eval(equation.value); 
-      logger.innerHTML = "Result at x=0: " + res;
-      logger.style.color = "green";
-      tryToDraw();
-    } catch (e) {
-      logger.innerHTML = e.message;
-      logger.style.color = "red";
-    }
-  }
-
-  function tryToDraw() {
-    var fun = new Function('x', 'return ' + equation.value);
-
-    a = parseFloat(document.getElementById('a').value);
-    b = parseFloat(document.getElementById('b').value);
-
-    rangeLines = [];
-    addNewRangeLine('A', a);
-    addNewRangeLine('B', b);
-
-    draw(fun);
-  }  
-
-  function propertiesChanged(event) {
-    // console.log(event);
-    elem = event.currentTarget;
-    if (elem.value >= 7) {
-      eval(elem.id + '= parseFloat(elem.value)');
-    }
-    draw();
-  }
-
-  function addPropertiesToSideBar() {
-    var parentDiv = document.getElementById('properties');
-    for(var i in properties) {
-      var e = properties[i];
-      var label = document.createElement('label');
-      label.innerHTML = e;
-      label.htmlFor = e;
-      var input = document.createElement('input');
-      input.className = 'u-full-width';
-      input.type = 'number';
-      input.min = 7;
-      input.id = e;
-      input.value = eval(e);
-      parentDiv.appendChild(label);
-      parentDiv.appendChild(input);
-      $('input').bind("propertychange change click keyup input paste", function(event) {
-        propertiesChanged(event);
-      });     
-    }
-  }
-
-
-  function startAlgo(event) {
-    algoStarted = !algoStarted;
-    $('#equation-section :input').prop("disabled", algoStarted);
-    if (algoStarted) {
-      event.srcElement.innerHTML = "Reset";
-      event.srcElement.classList.remove("button-primary");
-    } else {
-      event.srcElement.innerHTML = "Start";
-      event.srcElement.classList.add("button-primary");
-      tryToDraw();
-      return;
-    } 
-    startLooping();
-  }
-
-  function startLooping() {
-    var finish = false;
- 
-    midpoint = (a + b) / 2;
-    if (f(midpoint) * f(a) > 0) {
-      if (Math.abs(f(midpoint) - f(a)) <= (tolerance / 2)) finish = true;
-      console.log('a ' + f(midpoint) + " " + f(a));
-      a = midpoint;
-      addNewRangeLine('A', a);
-    } else {
-      if (Math.abs(f(midpoint) - f(b)) <= (tolerance / 2)) finish = true;
-      console.log('b ' + f(midpoint) + " " + f(b));
-      b = midpoint;
-      addNewRangeLine('B', b);
-    }
-    
-    draw();
-
-    if(finish) {
-      logger.innerHTML = "Root found = " + ((a + b) / 2) + "<br>" +
-        "After " + (rangeLines.length - 2) + " iterations.";
-      logger.style.color = "green";
-    } else {
-      setTimeout(function(){ startLooping(); }, 500);
-    } 
-  }
-</script>
+  <a href="https://github.com/AhmedAtef07/bisection_plotter" target="_blank"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>   
+  
+  </body>
+</html>
