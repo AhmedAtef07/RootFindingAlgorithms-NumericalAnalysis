@@ -1,10 +1,52 @@
 <script src="script.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<!-- <link rel="stylesheet" href="reset.css"> -->
+<link rel="stylesheet" href="style.css">
 
-<body onload="draw()" style="text-align: center;">
-  <input type="text" id="equation" onKeyUp="checkEquation(event)">
-  <h3 id="equation-status"></h3>
-  <canvas id="canvas" width="800" height="250"></canvas>
-    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
+
+<title>Atef's Plotter</title>
+
+<body onload="runOnce()">
+  <div class="full-width-container">
+    <div class="row">
+      
+      <!-- Side Bar Section -->
+      <div class="three columns">
+        <div class="row">
+          <div>
+            <label for="equation">Equation</label>
+            <label style="color: gray; font-size: smaller;">Use JavaScript Syntax</label>
+            <input class="u-full-width" type="text" placeholder="4 * Math.cos(2 * x) " id="equation" value="Math.sin(Math.pow(x, 2))" onKeyUp="checkEquation(event)">
+            <h5 id="equation-status"></h5>
+          </div>
+          <hr>
+          <div id="properties">
+          </div>
+          <hr>
+          <div>
+            <label>Useful Methods</label>
+            <ul>
+              <li>Math.E</li>
+              <li>Math.cos</li>
+              <li>Math.PI</li>
+              <li>Math.pow(x, 2)</li>
+            </ul>
+          </div>
+        </div>
+      </div>     
+      <!-- ./Side Bar Section -->
+
+
+      <!-- Content Section -->
+      <div class="nine columns">
+        <canvas id="canvas"></canvas>    
+      </div>
+      <!-- ./Content Section -->
+
+
+   </div>
+  </div>    
 </body>
 
 
@@ -14,30 +56,51 @@
   var equation = document.getElementById('equation');
 
   function checkEquation (event) {
-    if(event.keyCode == 13){
-        tryToDraw();
-    }
     try {
       var x = 0;
       var res = eval(equation.value); 
-      logger.innerHTML = res;
+      logger.innerHTML = "Result at x=0: " + res;
+      logger.style.color = "green";
+      tryToDraw();
     } catch (e) {
       logger.innerHTML = e.message;
+      logger.style.color = "red";
     }
   }
 
   function tryToDraw() {
-    try {
-      var x = 0;
-      var res = eval(equation.value); 
-      logger.innerHTML = res;
-      var fun = new Function('x', 'return ' + equation.value);
-      console.log(fun);
-      draw(fun);
-    } catch (e) {
-      logger.innerHTML = e.message;
+    var fun = new Function('x', 'return ' + equation.value);
+    draw(fun);
+  }  
+
+  function propertiesChanged(event) {
+    // console.log(event);
+    elem = event.currentTarget;
+    if (elem.value >= 7) {
+      eval(elem.id + '= parseInt(elem.value)');
     }
+    tryToDraw();
   }
-  
+
+  (function addPropertiesToSideBar() {
+    var parentDiv = document.getElementById('properties');
+    for(var i in properties) {
+      var e = properties[i];
+      var label = document.createElement('label');
+      label.innerHTML = e;
+      label.htmlFor = e;
+      var input = document.createElement('input');
+      input.className = 'u-full-width';
+      input.type = 'number';
+      input.min = 7;
+      input.id = e;
+      input.value = eval(e);
+      parentDiv.appendChild(label);
+      parentDiv.appendChild(input);
+      $(input).bind("propertychange change click keyup input paste", function(event) {
+        propertiesChanged(event);
+      });     
+    }
+  })();
 
 </script>

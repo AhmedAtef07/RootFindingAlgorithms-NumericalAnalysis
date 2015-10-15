@@ -1,0 +1,10 @@
+.full-width-container {
+  width: 100%;
+  max-width: 100%;
+  clear: both;
+  margin: 0 auto;
+}
+
+label:first-letter {
+  text-transform:capitalize;
+}
