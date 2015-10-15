@@ -14,23 +14,29 @@
       <!-- Side Bar Section -->
       <div class="three columns">
         <div class="row">
-          <div>
+          <div id="equation-section">
             <label for="equation">Equation</label>
             <label style="color: gray; font-size: smaller;">Use JavaScript Syntax</label>
-            <input class="u-full-width" type="text" placeholder="4 * Math.cos(2 * x) " id="equation" value="Math.sin(Math.pow(x, 2))" onKeyUp="checkEquation(event)">
+            <input class="u-full-width" type="text" placeholder="Math.sin(Math.pow(x, 2))" id="equation" value="Math.pow(x - 3, 3) + 3" onKeyUp="checkEquation(event)">
             <h5 id="equation-status"></h5>
+            <label for="a">a</label>
+            <input class="u-full-width" type="number" step="0.1" id="a">
+            <label for="b">b</label>
+            <input class="u-full-width" type="number" step="0.1" id="b">
+            <label for="tolerance">tolerance</label>
+            <input class="u-full-width" type="number" step="0.1" id="tolerance" min=".2">
           </div>
-          <hr>
-          <div id="properties">
-          </div>
+            <button class="button button-primary u-full-width" onclick="startAlgo(event)">Start Bisection Algo</button>
+          <div id="properties"></div>
           <hr>
           <div>
             <label>Useful Methods</label>
             <ul>
               <li>Math.E</li>
-              <li>Math.cos</li>
+              <li>Math.cos(2 * x)</li>
               <li>Math.PI</li>
               <li>Math.pow(x, 2)</li>
+              <li>Math.abs(-5)</li>
             </ul>
           </div>
         </div>
@@ -70,6 +76,14 @@
 
   function tryToDraw() {
     var fun = new Function('x', 'return ' + equation.value);
+
+    a = parseFloat(document.getElementById('a').value);
+    b = parseFloat(document.getElementById('b').value);
+
+    rangeLines = [];
+    addNewRangeLine('A', a);
+    addNewRangeLine('B', b);
+
     draw(fun);
   }  
 
@@ -77,12 +91,12 @@
     // console.log(event);
     elem = event.currentTarget;
     if (elem.value >= 7) {
-      eval(elem.id + '= parseInt(elem.value)');
+      eval(elem.id + '= parseFloat(elem.value)');
     }
-    tryToDraw();
+    draw();
   }
 
-  (function addPropertiesToSideBar() {
+  function addPropertiesToSideBar() {
     var parentDiv = document.getElementById('properties');
     for(var i in properties) {
       var e = properties[i];
@@ -97,10 +111,52 @@
       input.value = eval(e);
       parentDiv.appendChild(label);
       parentDiv.appendChild(input);
-      $(input).bind("propertychange change click keyup input paste", function(event) {
+      $('input').bind("propertychange change click keyup input paste", function(event) {
         propertiesChanged(event);
       });     
     }
-  })();
+  }
 
+
+  function startAlgo(event) {
+    algoStarted = !algoStarted;
+    $('#equation-section :input').prop("disabled", algoStarted);
+    if (algoStarted) {
+      event.srcElement.innerHTML = "Reset";
+      event.srcElement.classList.remove("button-primary");
+    } else {
+      event.srcElement.innerHTML = "Start";
+      event.srcElement.classList.add("button-primary");
+      tryToDraw();
+      return;
+    } 
+    startLooping();
+  }
+
+  function startLooping() {
+    var finish = false;
+ 
+    midpoint = (a + b) / 2;
+    if (f(midpoint) * f(a) > 0) {
+      if (Math.abs(f(midpoint) - f(a)) <= (tolerance / 2)) finish = true;
+      console.log('a ' + f(midpoint) + " " + f(a));
+      a = midpoint;
+      addNewRangeLine('A', a);
+    } else {
+      if (Math.abs(f(midpoint) - f(b)) <= (tolerance / 2)) finish = true;
+      console.log('b ' + f(midpoint) + " " + f(b));
+      b = midpoint;
+      addNewRangeLine('B', b);
+    }
+    
+    draw();
+
+    if(finish) {
+      logger.innerHTML = "Root found = " + ((a + b) / 2) + "<br>" +
+        "After " + (rangeLines.length - 2) + " iterations.";
+      logger.style.color = "green";
+    } else {
+      setTimeout(function(){ startLooping(); }, 500);
+    } 
+  }
 </script>
