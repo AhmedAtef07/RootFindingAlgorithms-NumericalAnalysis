@@ -205,6 +205,7 @@ function tryToDraw() {
 
   a = parseFloat(document.getElementById('a').value);
   b = parseFloat(document.getElementById('b').value);
+  tolerance = parseFloat(document.getElementById('tolerance').value);
 
   rangeLines = [];
   addNewRangeLine('A', a);
