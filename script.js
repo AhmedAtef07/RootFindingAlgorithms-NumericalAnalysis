@@ -205,6 +205,7 @@ function tryToDraw() {
 
   a = parseFloat(document.getElementById('a').value);
   b = parseFloat(document.getElementById('b').value);
+  tolerance = parseFloat(document.getElementById('tolerance').value);
 
   rangeLines = [];
   addNewRangeLine('A', a);
@@ -262,7 +263,6 @@ function startAlgo(event) {
 
 function startLooping() {
   var finish = false;
-
   midpoint = (a + b) / 2;
   if (f(midpoint) * f(a) > 0) {
     if (Math.abs(f(midpoint) - f(a)) <= (tolerance / 2)) finish = true;
