@@ -27,6 +27,7 @@ var rangeLines = {};
 
 var logger;
 var equation;
+var table;
 
 
 function runOnce() {
@@ -245,6 +246,7 @@ function addPropertiesToSideBar() {
 }
 
 
+var counter  = 0;
 function startAlgo(event) {
   algoStarted = !algoStarted;
   var target = event.target || event.srcElement;
@@ -253,6 +255,8 @@ function startAlgo(event) {
     target.innerHTML = "Reset";
     target.classList.remove("button-primary");
   } else {
+    table.innerHTML = "";
+    counter = 0;
     target.innerHTML = "Start";
     target.classList.add("button-primary");
     tryToDraw();
@@ -260,18 +264,33 @@ function startAlgo(event) {
   } 
   startLooping();
 }
+function fillTable() {
+  table = document.getElementById("myTable");
+  var row = table.insertRow(counter);
+  counter++;
+  var cell1 = row.insertCell(0);
+  var cell2 = row.insertCell(1);
+  var cell3 = row.insertCell(2);
+  var cell4 = row.insertCell(3);
+  var cell5 = row.insertCell(4);
 
+  cell1.innerHTML = a;
+  cell2.innerHTML = b;
+  cell3.innerHTML = midpoint;
+  cell4.innerHTML = f(midpoint) * f(a);
+  cell5.innerHTML = f(midpoint) * f(b);
+  console.log (a + " " + b + " " + midpoint + " " + f(midpoint) * f(a) + " " + f(midpoint) * f(b) );
+}
 function startLooping() {
   var finish = false;
   midpoint = (a + b) / 2;
+  fillTable();
   if (f(midpoint) * f(a) > 0) {
     if (Math.abs(f(midpoint) - f(a)) <= (tolerance / 2)) finish = true;
-    console.log('a ' + f(midpoint) + " " + f(a));
     a = midpoint;
     addNewRangeLine('A', a);
   } else {
     if (Math.abs(f(midpoint) - f(b)) <= (tolerance / 2)) finish = true;
-    console.log('b ' + f(midpoint) + " " + f(b));
     b = midpoint;
     addNewRangeLine('B', b);
   }
