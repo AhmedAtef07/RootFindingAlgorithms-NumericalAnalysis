@@ -264,19 +264,13 @@ function startAlgo(event) {
   startLooping(0);
 }
 function fillTable(stepNumber) {
-  
+  var stepValues = [a, b, midpoint, f(midpoint) * f(a), f(midpoint) * f(b)];
+  var cells = [];
   var row = table.insertRow(stepNumber);
-  var cell1 = row.insertCell(0);
-  var cell2 = row.insertCell(1);
-  var cell3 = row.insertCell(2);
-  var cell4 = row.insertCell(3);
-  var cell5 = row.insertCell(4);
-
-  cell1.innerHTML = a;
-  cell2.innerHTML = b;
-  cell3.innerHTML = midpoint;
-  cell4.innerHTML = f(midpoint) * f(a);
-  cell5.innerHTML = f(midpoint) * f(b);
+  for (var i = 0; i < stepValues.length; i++) {
+    cells[i] = row.insertCell(i);
+    cells[i].innerHTML = stepValues[i];
+  }
   console.log (a + " " + b + " " + midpoint + " " + f(midpoint) * f(a) + " " + f(midpoint) * f(b) );
 }
 function startLooping(stepNumber) {
@@ -297,7 +291,7 @@ function startLooping(stepNumber) {
 
   if(finish) {
     logger.innerHTML = "Root found = " + ((a + b) / 2) + "<br>" +
-      "After " + (rangeLines.length - 2) + " iterations.";
+      "After " + stepNumber + " iterations.";
     logger.style.color = "green";
   } else {
     setTimeout(function(){ startLooping(++stepNumber); }, 500);
