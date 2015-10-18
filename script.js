@@ -27,12 +27,14 @@ var rangeLines = {};
 
 var logger;
 var equation;
+var table;
 
 
 function runOnce() {
   logger = document.getElementById('equation-status');
   equation = document.getElementById('equation');
   var canvas = document.getElementById("canvas");
+  table = document.getElementById("steps-table");
   canvas.width = window.innerWidth - 400;
   canvas.height= window.innerHeight - 70;
   width = canvas.width;
@@ -253,26 +255,34 @@ function startAlgo(event) {
     target.innerHTML = "Reset";
     target.classList.remove("button-primary");
   } else {
+    table.innerHTML = "";
     target.innerHTML = "Start";
     target.classList.add("button-primary");
     tryToDraw();
     return;
   } 
-  startLooping();
+  startLooping(0);
 }
-
-function startLooping() {
+function fillTable(stepNumber) {
+  var stepValues = [a, b, midpoint, f(midpoint) * f(a), f(midpoint) * f(b)];
+  var cells = [];
+  var row = table.insertRow(stepNumber);
+  for (var i = 0; i < stepValues.length; i++) {
+    cells[i] = row.insertCell(i);
+    cells[i].innerHTML = stepValues[i];
+  }
+  console.log (a + " " + b + " " + midpoint + " " + f(midpoint) * f(a) + " " + f(midpoint) * f(b) );
+}
+function startLooping(stepNumber) {
   var finish = false;
-
   midpoint = (a + b) / 2;
+  fillTable(stepNumber);
   if (f(midpoint) * f(a) > 0) {
     if (Math.abs(f(midpoint) - f(a)) <= (tolerance / 2)) finish = true;
-    console.log('a ' + f(midpoint) + " " + f(a));
     a = midpoint;
     addNewRangeLine('A', a);
   } else {
     if (Math.abs(f(midpoint) - f(b)) <= (tolerance / 2)) finish = true;
-    console.log('b ' + f(midpoint) + " " + f(b));
     b = midpoint;
     addNewRangeLine('B', b);
   }
@@ -281,9 +291,9 @@ function startLooping() {
 
   if(finish) {
     logger.innerHTML = "Root found = " + ((a + b) / 2) + "<br>" +
-      "After " + (rangeLines.length - 2) + " iterations.";
+      "After " + stepNumber + " iterations.";
     logger.style.color = "green";
   } else {
-    setTimeout(function(){ startLooping(); }, 500);
+    setTimeout(function(){ startLooping(++stepNumber); }, 500);
   } 
 }
