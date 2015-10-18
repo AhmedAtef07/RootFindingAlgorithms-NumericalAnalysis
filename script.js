@@ -34,6 +34,7 @@ function runOnce() {
   logger = document.getElementById('equation-status');
   equation = document.getElementById('equation');
   var canvas = document.getElementById("canvas");
+  table = document.getElementById("steps-table");
   canvas.width = window.innerWidth - 400;
   canvas.height= window.innerHeight - 70;
   width = canvas.width;
@@ -246,7 +247,6 @@ function addPropertiesToSideBar() {
 }
 
 
-var counter  = 0;
 function startAlgo(event) {
   algoStarted = !algoStarted;
   var target = event.target || event.srcElement;
@@ -256,18 +256,16 @@ function startAlgo(event) {
     target.classList.remove("button-primary");
   } else {
     table.innerHTML = "";
-    counter = 0;
     target.innerHTML = "Start";
     target.classList.add("button-primary");
     tryToDraw();
     return;
   } 
-  startLooping();
+  startLooping(0);
 }
-function fillTable() {
-  table = document.getElementById("myTable");
-  var row = table.insertRow(counter);
-  counter++;
+function fillTable(stepNumber) {
+  
+  var row = table.insertRow(stepNumber);
   var cell1 = row.insertCell(0);
   var cell2 = row.insertCell(1);
   var cell3 = row.insertCell(2);
@@ -281,10 +279,10 @@ function fillTable() {
   cell5.innerHTML = f(midpoint) * f(b);
   console.log (a + " " + b + " " + midpoint + " " + f(midpoint) * f(a) + " " + f(midpoint) * f(b) );
 }
-function startLooping() {
+function startLooping(stepNumber) {
   var finish = false;
   midpoint = (a + b) / 2;
-  fillTable();
+  fillTable(stepNumber);
   if (f(midpoint) * f(a) > 0) {
     if (Math.abs(f(midpoint) - f(a)) <= (tolerance / 2)) finish = true;
     a = midpoint;
@@ -302,6 +300,6 @@ function startLooping() {
       "After " + (rangeLines.length - 2) + " iterations.";
     logger.style.color = "green";
   } else {
-    setTimeout(function(){ startLooping(); }, 500);
+    setTimeout(function(){ startLooping(++stepNumber); }, 500);
   } 
 }
