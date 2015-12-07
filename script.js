@@ -263,8 +263,13 @@ function startAlgo(event) {
   } 
   startLooping(0);
 }
-function fillTable(stepNumber) {
-  var stepValues = [a, b, midpoint, f(midpoint) * f(a), f(midpoint) * f(b)];
+
+function fillTable(stepNumber, midpoint, preMidpoint) {
+  if(stepNumber == 0) {
+    var stepValues = [a, b, midpoint, f(midpoint)  , '-'];
+  } else {
+    var stepValues = [a, b, midpoint, f(midpoint)  , Math.abs(midpoint - preMidpoint)];
+  }
   var cells = [];
   var row = table.insertRow(stepNumber);
   for (var i = 0; i < stepValues.length; i++) {
@@ -273,16 +278,18 @@ function fillTable(stepNumber) {
   }
   console.log (a + " " + b + " " + midpoint + " " + f(midpoint) * f(a) + " " + f(midpoint) * f(b) );
 }
+
 function startLooping(stepNumber) {
   var finish = false;
   midpoint = (a + b) / 2;
-  fillTable(stepNumber);
   if (f(midpoint) * f(a) > 0) {
-    if (Math.abs(f(midpoint) - f(a)) <= (tolerance / 2)) finish = true;
+    if (Math.abs(midpoint - a) <= (tolerance / 2)) finish = true;
+    fillTable(stepNumber, midpoint, a);
     a = midpoint;
     addNewRangeLine('A', a);
   } else {
-    if (Math.abs(f(midpoint) - f(b)) <= (tolerance / 2)) finish = true;
+    if (Math.abs(midpoint - b) <= (tolerance / 2)) finish = true;
+    fillTable(stepNumber, midpoint, b);
     b = midpoint;
     addNewRangeLine('B', b);
   }
