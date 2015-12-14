@@ -33,8 +33,8 @@ var table;
 function runOnce() {
   logger = document.getElementById('equation-status');
   equation = document.getElementById('equation');
-  var canvas = document.getElementById("canvas");
-  table = document.getElementById("steps-table");
+  var canvas = document.getElementById('canvas');
+  table = document.getElementById('steps-table');
   canvas.width = window.innerWidth - 400;
   canvas.height= window.innerHeight - 70;
   width = canvas.width;
@@ -47,9 +47,30 @@ function runOnce() {
   $('#a').val(a);
   $('#b').val(b);
   $('#tolerance').val(tolerance);
+  if(get('equation') != undefined) {
+    document.getElementById('equation').value =  get('equation');
+  }
+  if(get('a') != undefined) {
+    document.getElementById('a').value =  get('a');
+  }
+  if(get('b') != undefined) {
+    document.getElementById('b').value =  get('b');
+  }
+  if(get('tolerance') != undefined) {
+    document.getElementById('tolerance').value =  get('tolerance');
+  }
   addPropertiesToSideBar();
 
   tryToDraw();
+
+  if(window.location.search.includes('autostart')) {
+    document.getElementsByTagName('button')[0].click();
+  }
+}
+
+function get(name){
+   if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
+      return decodeURIComponent(name[1]);
 }
 
 function draw(fun) {
@@ -246,7 +267,6 @@ function addPropertiesToSideBar() {
   }
 }
 
-
 function startAlgo(event) {
   algoStarted = !algoStarted;
   var target = event.target || event.srcElement;
@@ -264,21 +284,6 @@ function startAlgo(event) {
   startLooping(0);
 }
 
-function fillTable(stepNumber, midpoint, preMidpoint) {
-  if(stepNumber == 0) {
-    var stepValues = [a, b, midpoint, f(midpoint)  , '-'];
-  } else {
-    var stepValues = [a, b, midpoint, f(midpoint)  , Math.abs(midpoint - preMidpoint)];
-  }
-  var cells = [];
-  var row = table.insertRow(stepNumber);
-  for (var i = 0; i < stepValues.length; i++) {
-    cells[i] = row.insertCell(i);
-    cells[i].innerHTML = stepValues[i];
-  }
-  console.log (a + " " + b + " " + midpoint + " " + f(midpoint) * f(a) + " " + f(midpoint) * f(b) );
-}
-
 function startLooping(stepNumber) {
   var finish = false;
   midpoint = (a + b) / 2;
@@ -293,6 +298,21 @@ function startLooping(stepNumber) {
     b = midpoint;
     addNewRangeLine('B', b);
   }
+
+function fillTable(stepNumber, midpoint, preMidpoint) {
+  if(stepNumber == 0) {
+    var stepValues = [a, b, midpoint, f(midpoint)  , '-'];
+  } else {
+    var stepValues = [a, b, midpoint, f(midpoint)  , Math.abs(midpoint - preMidpoint)];
+  }
+  var cells = [];
+  var row = table.insertRow(stepNumber);
+  for (var i = 0; i < stepValues.length; i++) {
+    cells[i] = row.insertCell(i);
+    cells[i].innerHTML = stepValues[i];
+  }
+  console.log (a + " " + b + " " + midpoint + " " + f(midpoint) * f(a) + " " + f(midpoint) * f(b) );
+}
   
   draw();
 
@@ -300,7 +320,10 @@ function startLooping(stepNumber) {
     logger.innerHTML = "Root found = " + ((a + b) / 2) + "<br>" +
       "After " + stepNumber + " iterations.";
     logger.style.color = "green";
+    setGetParams();
   } else {
     setTimeout(function(){ startLooping(++stepNumber); }, 500);
   } 
 }
+
+
