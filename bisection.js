@@ -4,7 +4,7 @@ var width = 600;
 var height = 300;
 var a = -5;
 var b = 5;
-var tolerance = 4;
+var tolerance = 0.01;
 
 var constants = {
   rangeLine: {

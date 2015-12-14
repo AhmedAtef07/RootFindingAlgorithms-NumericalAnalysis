@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script src="bisection.js"></script>
+    <script src="secent.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
@@ -12,14 +12,13 @@
   <body onload="runOnce()">
     <div class="full-width-container">
       <div class="row">
-        
         <!-- Side Bar Section -->
         <div class="three columns">
           <div class="row">
             <div id="equation-section">
               <label for="equation">Equation</label>
               <label style="color: gray; font-size: smaller;">Use JavaScript Syntax</label>
-              <input class="u-full-width" type="text" placeholder="Math.sin(Math.pow(x, 2))" id="equation" value="Math.pow(x - 3, 3) + 3" onKeyUp="checkEquation(event)">
+              <input class="u-full-width" type="text" placeholder="Math.sin(Math.pow(x, 2))" id="equation" value=".01 * Math.pow(x + 3, 3) - 1.5" onKeyUp="checkEquation(event)">
               <h5 id="equation-status"></h5>
               <label for="a">a</label>
               <input class="u-full-width" type="number" step="0.1" id="a">
@@ -28,7 +27,7 @@
               <label for="tolerance">tolerance</label>
               <input class="u-full-width" type="number" step="0.1" id="tolerance" min=".2">
             </div>
-              <button class="button button-primary u-full-width" onclick="startAlgo(event)">Start Bisection Algo</button>
+              <button class="button button-primary u-full-width" onclick="startAlgo(event)">Start Secent Algo</button>
             <div id="properties"></div>
             <hr>
             <div>
@@ -45,26 +44,11 @@
         </div>     
         <!-- ./Side Bar Section -->
 
-
         <!-- Content Section -->
         <div class="nine columns">
           <canvas id="canvas"></canvas>  
-          <table >
-            <thead>
-              <tr>
-                <th style="width: 20%;">A</th>
-                <th style="width: 20%;">B</th>
-                <th style="width: 20%;">X</th>
-                <th style="width: 20%;">F(x)</th>
-                <th style="width: 40%;">|Xnew - Xold|</th>
-              </tr>
-            </thead>
-            <tbody id="steps-table"></tbody>
-          </table>  
         </div>
         <!-- ./Content Section -->
-
-
      </div>
     </div> 
 
