@@ -5,6 +5,7 @@ var height = 300;
 var a = -5;
 var b = 5;
 var tolerance = 0.01;
+var xVector = [];
 
 var constants = {
   rangeLine: {
@@ -19,17 +20,19 @@ var constants = {
   }
 };
 
-var algoStarted = false;
+var isSolving = false;
 
 var rangeLines = {};
 
 var logger;
 var equation;
+var table;
 
 
 function runOnce() {
   logger = document.getElementById('equation-status');
   equation = document.getElementById('equation');
+  table = document.getElementById('steps-table');
   var canvas = document.getElementById('canvas');
   canvas.width = window.innerWidth - 400;
   canvas.height= window.innerHeight - 70;
@@ -37,7 +40,7 @@ function runOnce() {
   height = canvas.height;
 
 
-  $('#a, #b, #tolerance').bind("propertychange change click keyup input paste", function(event) {
+  $('#equation, #a, #b, #tolerance').bind("propertychange change click keyup input paste", function(event) {
     checkEquation(event);
   });  
   $('#a').val(a);
@@ -239,7 +242,6 @@ function tryToDraw() {
 }  
 
 function propertiesChanged(event) {
-  // console.log(event);
   elem = event.currentTarget;
   if (elem.value >= 7) {
     eval(elem.id + '= parseFloat(elem.value)');
@@ -269,43 +271,65 @@ function addPropertiesToSideBar() {
 }
 
 function startAlgo(event) {
-  algoStarted = !algoStarted;
+  isSolving = !isSolving;
   var target = event.target || event.srcElement;
-  $('#equation-section :input').prop("disabled", algoStarted);
-  if (algoStarted) {
+  $('#equation-section :input').prop("disabled", isSolving);
+  if (isSolving) {
     target.innerHTML = "Reset";
     target.classList.remove("button-primary");
   } else {
     target.innerHTML = "Start";
     target.classList.add("button-primary");
-    tryToDraw();
     return;
   } 
+  xVector.push(Math.min(a, b));
+  xVector.push(Math.max(a, b));
   startLooping(0);
 }
 
 function startLooping(stepNumber) {
+  if (!isSolving) return;
   var finish = false;
-  addNewRangeLine('A', a, f(a), b, f(b));
-  midpoint = (a + b) / 2;
-  if (f(midpoint) * f(a) > 0) {
-    if (Math.abs(midpoint - a) <= (tolerance / 2)) finish = true;
-    a = midpoint;
-  } else {
-    if (Math.abs(midpoint - b) <= (tolerance / 2)) finish = true;
-    b = midpoint;
+  // addNewRangeLine('A', a, f(a), b, f(b));
+  var f = new Function('x', 'return ' + equation.value);
+
+  xn2 = xVector[xVector.length - 2];
+  xn1 = xVector[xVector.length - 1];
+  xs = secentMethod(xn2, xn1);
+  diff = Math.abs(xs - xn1);
+
+  values = {
+    "Iteration #": stepNumber,
+    "x-1": xn2,
+    "x0": xn1,
+    "F(x-1)": f(xn2),
+    "F(x0)": f(xn1),
+    "x+1": xs,
+    "|x+1 - x0|": diff
+  };
+  xVector.push(xs);    
+  addTableRow(values);
+
+  if (diff < tolerance) {
+    finish = true;
   }
-  console.log(f);
-  
-  draw();
 
   if(finish) {
-    logger.innerHTML = "Root found = " + ((a + b) / 2) + "<br>" +
-      "After " + (rangeLines.length - 2) + " iterations.";
+    logger.innerHTML = "Root found = " + xs + "<br>" +
+      "After " + (stepNumber) + " iterations.";
     logger.style.color = "green";
   } else {
-    setTimeout(function(){ startLooping(stepNumber + 1); }, 500);
+    setTimeout( function() { startLooping(stepNumber + 1); }, 500);
   } 
+}
+
+function addTableRow(values) {
+  var p = Math.max(0, Math.floor(Math.log10(tolerance)) * -1 + 1);
+  var cells = [];
+  var row = table.insertRow();
+  for (var v in values) {
+    row.insertCell().innerHTML = values[v].toFixed(p);
+  }  
 }
 
 function secentMethod(x0, x1) {

@@ -18,7 +18,7 @@
             <div id="equation-section">
               <label for="equation">Equation</label>
               <label style="color: gray; font-size: smaller;">Use JavaScript Syntax</label>
-              <input class="u-full-width" type="text" placeholder="Math.sin(Math.pow(x, 2))" id="equation" value=".01 * Math.pow(x + 3, 3) - 1.5" onKeyUp="checkEquation(event)">
+              <input class="u-full-width" type="text" placeholder="Math.sin(Math.pow(x, 2))" id="equation" value=".01 * Math.pow(x + 3, 3) - 1.5 + Math.sin(x) - x">
               <h5 id="equation-status"></h5>
               <label for="a">a</label>
               <input class="u-full-width" type="number" step="0.1" id="a">
@@ -47,6 +47,22 @@
         <!-- Content Section -->
         <div class="nine columns">
           <canvas id="canvas"></canvas>  
+          <table >
+            <thead>
+              <tr>
+                <th>Iteration #</th>
+                <th>x-1</th>
+                <th>x0</th>
+                <th>F(x-1)</th>
+                <th>F(x0)</th>
+                <th>x+1</th>
+                <th>|x+1 - x0|</th>
+              </tr>
+            </thead>
+            <tbody id="steps-table">
+                
+            </tbody>
+          </table>  
         </div>
         <!-- ./Content Section -->
      </div>
