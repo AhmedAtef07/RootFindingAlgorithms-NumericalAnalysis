@@ -283,6 +283,7 @@ function startAlgo(event) {
     target.classList.add("button-primary");
     return;
   } 
+  xVector.push(Math.min(a, b));
   xVector.push(Math.max(a, b));
   var f = new Function('x', 'return ' + equation.value);
   // var etaF = new Function('x', 'return', etaf); 
@@ -299,7 +300,7 @@ function startLooping(stepNumber) {
   xn2 = xVector[xVector.length - 1];
   xn1 = xVector[xVector.length - 1];
   console.log(xn1);
-  xs = successiveMethod(xn2, xn1);
+  xs = successiveMethod(xn1);
   diff = Math.abs(xs - xn1);
 
   values = {
@@ -336,8 +337,8 @@ function addTableRow(values) {
   }  
 }
 
-function successiveMethod(x0, x1) {
+function successiveMethod(x0) {
   var f = new Function('x', 'return ' + equation.value);
   console.log(f);
-  return x1 + eta * f(x0);
+  return x0 + eta * f(x0);
 }
